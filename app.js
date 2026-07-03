@@ -1,36 +1,59 @@
-import express from "express";
-import puppeteer from "puppeteer";
-import cors from "cors";
-import dotenv from "dotenv";
 
-dotenv.config();
+import { Hono } from "hono";
+import { handle } from "hono/vercel";
+import { serve } from "@hono/node-server";
+import { getBrowser } from "./config/browser.js";
+import { addSignatureToPdf } from "./config/pdf.js";
 
-const app = express();
-app.use(cors());
-app.use(express.json());
+const app = new Hono();
 
-app.post("/api/generate-pdf", async (req, res) => {
-    const { html } = req.body;
+app.post("/pdf", async (c) => {
+    const html = await c.req.text();
 
-    const browser = await puppeteer.launch({
-        headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"]
-    });
+    if (!html) {
+        return c.text("El HTML está vacío", 400);
+    }
 
+    const browser = await getBrowser();
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
 
-    const pdfBuffer = await page.pdf({
-        format: "A4",
-        printBackground: true
-    });
+    try {
+        await page.setContent(html, {
+            waitUntil: "networkidle0",
+        });
 
-    await browser.close();
+        const pdf = await page.pdf({
+            format: "A4",
+            printBackground: true,
+            margin: {
+                top: "15mm",
+                bottom: "20mm",
+            },
+        });
 
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", "inline; filename=report.pdf");
-    res.send(pdfBuffer);
+        const finalPdf = await addSignatureToPdf(pdf);
+       
+        return c.body(finalPdf, 200, {
+            "Content-Type": "application/pdf",
+            "Content-Disposition": "inline; filename=documento.pdf",
+        });
+
+    } finally {
+        await page.close();
+        await browser.close();
+    }
 });
 
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Server running on ${process.env.SERVER_URL}:${PORT}`));
+export const POST = handle(app);
+
+if (!process.env.VERCEL) {
+    serve(
+        {
+            fetch: app.fetch,
+            port: 3000,
+        },
+        () => {
+            console.log("Servidor ejecutándose en http://localhost:3000");
+        }
+    );
+}
