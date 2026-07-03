@@ -4,6 +4,9 @@ import { handle } from "hono/vercel";
 import { serve } from "@hono/node-server";
 import { getBrowser } from "./config/browser.js";
 import { addSignatureToPdf } from "./config/pdf.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = new Hono();
 
@@ -11,7 +14,7 @@ app.post("/pdf", async (c) => {
     const html = await c.req.text();
 
     if (!html) {
-        return c.text("El HTML está vacío", 400);
+        return c.text("", 400);
     }
 
     const browser = await getBrowser();
@@ -32,7 +35,7 @@ app.post("/pdf", async (c) => {
         });
 
         const finalPdf = await addSignatureToPdf(pdf);
-       
+
         return c.body(finalPdf, 200, {
             "Content-Type": "application/pdf",
             "Content-Disposition": "inline; filename=documento.pdf",
@@ -53,7 +56,7 @@ if (!process.env.VERCEL) {
             port: 3000,
         },
         () => {
-            console.log("Servidor ejecutándose en http://localhost:3000");
+            console.log(`Servidor ejecutándose en ${process.env.SERVER_URL + ':' + process.env.PORT}`);
         }
     );
 }
