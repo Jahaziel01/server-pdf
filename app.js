@@ -29,8 +29,10 @@ app.post("/pdf", async (c) => {
             format: "A4",
             printBackground: true,
             margin: {
-                top: "15mm",
-                bottom: "20mm",
+                top: "10mm",
+                right: "10mm",
+                bottom: "0mm",
+                left: "10mm",
             },
         });
 
@@ -53,10 +55,10 @@ if (!process.env.VERCEL) {
     serve(
         {
             fetch: app.fetch,
-            port: 3000,
+            port: 2000,
         },
         () => {
-            console.log(`Servidor ejecutándose en ${process.env.SERVER_URL + ':' + process.env.PORT}`);
+            console.log(`Servidor ejecutándose en ${process.env.SERVER_URL}`);
         }
     );
 }
