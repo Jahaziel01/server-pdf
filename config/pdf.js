@@ -41,7 +41,7 @@ export async function addSignatureToPdf(pdf) {
     lastPage.drawText("Presidente: Andres García", {
         x: margin + 8,
         y: baseY - 15,
-        size: 10,
+        size: 9,
         font,
     });
 
@@ -54,7 +54,7 @@ export async function addSignatureToPdf(pdf) {
     lastPage.drawText("Recibido por", {
         x: width - margin - font.widthOfTextAtSize("Recibido por", 10) - 35,
         y: baseY - 15,
-        size: 10,
+        size: 9,
         font,
     });
 
