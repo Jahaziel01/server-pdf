@@ -22,7 +22,7 @@ export async function addSignatureToPdf(pdf) {
         fs.readFileSync(imageSignaturePath)
     );
 
-    const margin = 20;
+    const margin = 45;
     const baseY = 50;
 
     lastPage.drawLine({

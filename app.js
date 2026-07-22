@@ -11,6 +11,8 @@ dotenv.config();
 const app = new Hono();
 
 app.post("/pdf", async (c) => {
+
+    const signature = c.req.query("signature");
     const html = await c.req.text();
 
     if (!html) {
@@ -37,7 +39,13 @@ app.post("/pdf", async (c) => {
             },
         });
 
-        const finalPdf = await addSignatureToPdf(pdf);
+        let finalPdf;
+
+        if (signature === "none") {
+            finalPdf = pdf;
+        } else {
+            finalPdf = await addSignatureToPdf(pdf);
+        }
 
         return c.body(finalPdf, 200, {
             "Content-Type": "application/pdf",
