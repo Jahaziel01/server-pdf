@@ -32,10 +32,10 @@ app.post("/pdf", async (c) => {
             scale: 0.80,
             printBackground: true,
             margin: {
-                top: "10mm",
-                right: "10mm",
+                top: "5mm",
+                right: "5mm",
                 bottom: "0mm",
-                left: "10mm",
+                left: "5mm",
             },
         });
 
