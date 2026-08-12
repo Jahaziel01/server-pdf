@@ -29,7 +29,7 @@ app.post("/pdf", async (c) => {
 
         const pdf = await page.pdf({
             format: "A4",
-            scale: 0.85,
+            scale: 0.82,
             printBackground: true,
             margin: {
                 top: "10mm",
