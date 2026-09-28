@@ -13,6 +13,8 @@ const app = new Hono();
 app.post("/pdf", async (c) => {
 
     const signature = c.req.query("signature");
+    const size = c.req.query("size");
+
     const html = await c.req.text();
 
     if (!html) {
@@ -29,7 +31,7 @@ app.post("/pdf", async (c) => {
 
         const pdf = await page.pdf({
             format: "A4",
-            scale: 0.78,
+            scale: size === "medium" ? 0.90 : 0.78,
             printBackground: true,
             margin: {
                 top: "5mm",
